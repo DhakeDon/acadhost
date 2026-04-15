@@ -1,0 +1,67 @@
+# ============================================================
+# AcadHost — .gitignore
+# ============================================================
+
+# Environment secrets — never commit
+.env
+.env.local
+.env.*.local
+
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Frontend build outputs
+frontend/student-dashboard/dist/
+frontend/student-dashboard/build/
+frontend/admin-dashboard/dist/
+frontend/admin-dashboard/build/
+
+# Uploaded ZIP files (Section 1.7 — temp storage before extraction)
+**/uploads/
+!**/uploads/.gitkeep
+
+# Build log files (Section 1.7 — 7-day retention, not versioned)
+**/build/logs/
+
+# Host-level project source directories (Section 2.6 — runtime, not repo)
+# Controlled by PROJECTS_BASE_DIR env var
+# Production:  /home/acadhost/projects
+# Windows Dev: C:/acadhost/projects
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V5
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary files
+tmp/
+temp/
+
+# Coverage reports
+coverage/
+
+# Optional npm cache
+.npm
+
+# Optional eslint cache
+.eslintcache
