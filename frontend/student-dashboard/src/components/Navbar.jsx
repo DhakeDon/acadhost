@@ -52,11 +52,7 @@ export default function Navbar() {
 
   return (
       <nav style={styles.nav}>
-        {/* ── Embedded theme variables ─────────────────────────────────── */}
         <style>{`
-          /* ── DARK mode navbar ── */
-          
-          /* ── Nav base ── */
           @media (max-width: 768px) {
             .nav-list-desktop { display: none !important; }
             .nav-hamburger    { display: inline-flex !important; }
@@ -90,27 +86,17 @@ export default function Navbar() {
           /* ── Dropdown menu ── */
           .avatar-menu {
             position: absolute;
-            top: calc(100% + 8px);
+            top: calc(100% + 6px);
             right: 0;
-            min-width: 210px;
-            background: var(--navbar-menu-bg);
-            border: 1px solid var(--navbar-border);
-            border-radius: 6px;
-            box-shadow: var(--navbar-menu-shadow);
+            min-width: 220px;
+            border-radius: 8px;
             overflow: hidden;
-            z-index: 200;
+            z-index: 9999;
             animation: menuFadeIn 0.15s ease;
           }
           @keyframes menuFadeIn {
-            from { opacity: 0; transform: translateY(-4px); }
+            from { opacity: 0; transform: translateY(-6px); }
             to   { opacity: 1; transform: translateY(0); }
-          }
-          .avatar-email {
-            padding: 0.75rem 1rem;
-            font-size: 0.75rem;
-            color: #6b7280;
-            border-bottom: 1px solid rgba(0,0,0,0.09);
-            line-height: 1.4;
           }
           .avatar-menu-item {
             display: flex;
@@ -120,8 +106,6 @@ export default function Navbar() {
             padding: 0.6rem 1rem;
             font-size: 0.78rem;
             font-weight: 500;
-            color: #111113;
-            background: transparent;
             border: none;
             cursor: pointer;
             text-decoration: none;
@@ -129,12 +113,8 @@ export default function Navbar() {
             transition: background 0.12s;
             letter-spacing: 0.01em;
           }
-          .avatar-menu-item:hover {
-            background: rgba(0,0,0,0.05);
-          }
           .avatar-menu-divider {
             height: 1px;
-            background: rgba(0,0,0,0.08);
             margin: 0.25rem 0;
           }
 
@@ -201,7 +181,6 @@ export default function Navbar() {
                 aria-label="Toggle theme"
             >
               {darkMode ? (
-                  /* Sun icon */
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="5"/>
                     <line x1="12" y1="1" x2="12" y2="3"/>
@@ -214,7 +193,6 @@ export default function Navbar() {
                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
                   </svg>
               ) : (
-                  /* Moon icon */
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                   </svg>
@@ -233,70 +211,108 @@ export default function Navbar() {
                 {initialsFrom(user)}
               </button>
 
-              {menuOpen && (
-                  <div className="avatar-menu" role="menu">
-                    <div className="avatar-email">
-                      <div style={{ fontWeight: 700, color: '#111113', fontSize: '0.82rem' }}>
-                        {user?.name || 'Student'}
+              {menuOpen && (() => {
+                const bg      = darkMode ? '#1a1a1a' : '#ffffff';
+                const border  = darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                const text    = darkMode ? '#e5e5e5' : '#111113';
+                const subtext = darkMode ? '#888' : '#6b7280';
+                const hoverBg = darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)';
+                const shadow  = darkMode
+                    ? '0 8px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4)'
+                    : '0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08)';
+
+                const itemStyle = { background: bg, color: text };
+                const onHover   = (e) => { e.currentTarget.style.background = hoverBg; };
+                const onLeave   = (e) => { e.currentTarget.style.background = bg; };
+
+                return (
+                    <div
+                        className="avatar-menu"
+                        role="menu"
+                        style={{ background: bg, border: `1px solid ${border}`, boxShadow: shadow }}
+                    >
+                      {/* Header */}
+                      <div style={{
+                        padding: '0.75rem 1rem',
+                        borderBottom: `1px solid ${border}`,
+                        lineHeight: 1.4,
+                        background: bg,
+                      }}>
+                        <div style={{ fontWeight: 700, color: text, fontSize: '0.82rem' }}>
+                          {user?.name || 'Student'}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: subtext, marginTop: '0.1rem' }}>
+                          {user?.email}
+                        </div>
                       </div>
-                      <div style={{ marginTop: '0.1rem' }}>{user?.email}</div>
+
+                      {/* Profile link */}
+                      <NavLink
+                          to="/profile"
+                          className="avatar-menu-item"
+                          onClick={() => setMenuOpen(false)}
+                          style={itemStyle}
+                          onMouseEnter={onHover}
+                          onMouseLeave={onLeave}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0, opacity:0.6 }}>
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        Profile &amp; Settings
+                      </NavLink>
+
+                      {/* Theme toggle */}
+                      <button
+                          className="avatar-menu-item"
+                          onClick={handleThemeToggle}
+                          style={itemStyle}
+                          onMouseEnter={onHover}
+                          onMouseLeave={onLeave}
+                      >
+                        {darkMode ? (
+                            <>
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0, opacity:0.6 }}>
+                                <circle cx="12" cy="12" r="5"/>
+                                <line x1="12" y1="1" x2="12" y2="3"/>
+                                <line x1="12" y1="21" x2="12" y2="23"/>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                                <line x1="1" y1="12" x2="3" y2="12"/>
+                                <line x1="21" y1="12" x2="23" y2="12"/>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                              </svg>
+                              Light Mode
+                            </>
+                        ) : (
+                            <>
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0, opacity:0.6 }}>
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                              </svg>
+                              Dark Mode
+                            </>
+                        )}
+                      </button>
+
+                      <div className="avatar-menu-divider" style={{ background: border }} />
+
+                      {/* Sign out */}
+                      <button
+                          className="avatar-menu-item"
+                          onClick={handleLogout}
+                          disabled={loggingOut}
+                          style={{ ...itemStyle, color: '#e05c5c' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = bg; }}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0, opacity:0.7 }}>
+                          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        {loggingOut ? 'Signing out…' : 'Sign out'}
+                      </button>
                     </div>
-
-                    <NavLink
-                        to="/profile"
-                        className="avatar-menu-item"
-                        onClick={() => setMenuOpen(false)}
-                    >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0, opacity:0.6 }}>
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                      </svg>
-                      Profile &amp; Settings
-                    </NavLink>
-
-                    <button
-                        className="avatar-menu-item"
-                        onClick={handleThemeToggle}
-                    >
-                      {darkMode ? (
-                          <>
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0, opacity:0.6 }}>
-                              <circle cx="12" cy="12" r="5"/>
-                              <line x1="12" y1="1" x2="12" y2="3"/>
-                              <line x1="12" y1="21" x2="12" y2="23"/>
-                              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                              <line x1="1" y1="12" x2="3" y2="12"/>
-                              <line x1="21" y1="12" x2="23" y2="12"/>
-                              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                            </svg>
-                            Light Mode
-                          </>
-                      ) : (
-                          <>
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0, opacity:0.6 }}>
-                              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                            </svg>
-                            Dark Mode
-                          </>
-                      )}
-                    </button>
-
-                    <div className="avatar-menu-divider" />
-
-                    <button
-                        className="avatar-menu-item"
-                        onClick={handleLogout}
-                        disabled={loggingOut}
-                        style={{ color: '#e05c5c' }}
-                    >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0, opacity:0.7 }}>
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-                      </svg>
-                      {loggingOut ? 'Signing out…' : 'Sign out'}
-                    </button>
-                  </div>
-              )}
+                );
+              })()}
             </div>
 
             {/* Mobile hamburger */}
