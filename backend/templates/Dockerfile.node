@@ -1,0 +1,20 @@
+# Stage 1: Install dependencies
+FROM node:{{RUNTIME_VERSION}}-alpine AS deps
+
+WORKDIR /app
+
+COPY source/backend/package*.json ./
+RUN npm ci --production
+
+# Stage 2: Runtime
+FROM node:{{RUNTIME_VERSION}}-alpine
+
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY source/backend/ ./
+
+ENV PORT=8080
+EXPOSE 8080
+
+CMD ["npm", "start"]

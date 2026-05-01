@@ -11,22 +11,36 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
-      - "${MYSQL_PORT:-3306}:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+
+#  phpmyadmin:
+#    image: phpmyadmin/phpmyadmin:latest
+#    container_name: acadhost-phpmyadmin
+#    restart: unless-stopped
+#    environment:
+#      PMA_HOST: mysql
+#      PMA_PORT: 3306
+#      PHPMYADMIN_BASE_PATH: ${PHPMYADMIN_BASE_PATH:-/phpmyadmin}
+#    ports:
+#      - "${PHPMYADMIN_PORT:-8080}:80"
+#    depends_on:
+#      - mysql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: acadhost-phpmyadmin
     restart: unless-stopped
     environment:
-      PMA_HOST: mysql
+      PMA_HOST: host.docker.internal
       PMA_PORT: 3306
-      PHPMYADMIN_BASE_PATH: ${PHPMYADMIN_BASE_PATH:-/phpmyadmin}
     ports:
-      - "${PHPMYADMIN_PORT:-8080}:80"
-    depends_on:
-      - mysql
+      - "${PHPMYADMIN_PORT:-8083}:80"
+    volumes:
+      - ./backend/phpmyadmin/signon.php:/var/www/html/signon.php
+      - ./backend/phpmyadmin/launch.php:/var/www/html/launch.php
+      - ./backend/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
 
   nginx:
     image: nginx:latest

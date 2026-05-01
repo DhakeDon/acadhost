@@ -1,0 +1,36 @@
+# Stage 1: Build frontend assets
+FROM node:20-alpine AS frontend-build
+
+WORKDIR /app
+
+COPY source/frontend/package*.json ./
+RUN npm ci
+
+COPY source/frontend/ ./
+RUN npm run build
+
+
+# Stage 2: Install backend dependencies
+FROM node:{{RUNTIME_VERSION}}-alpine AS backend-deps
+
+WORKDIR /app
+
+COPY source/backend/package*.json ./
+RUN npm ci --omit=dev
+
+COPY source/backend/ ./
+
+
+# Stage 3: Runtime -- combined
+FROM node:{{RUNTIME_VERSION}}-alpine
+
+WORKDIR /app
+
+COPY --from=backend-deps /app/node_modules ./node_modules
+COPY source/backend/ ./
+COPY --from=frontend-build /app/build ./public
+
+ENV PORT=8080
+EXPOSE 8080
+
+CMD ["npm", "start"]

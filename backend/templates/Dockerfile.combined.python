@@ -1,0 +1,32 @@
+# Stage 1: Build frontend assets
+FROM node:20-alpine AS frontend-build
+
+WORKDIR /app
+
+COPY source/frontend/package*.json ./
+RUN npm ci --production=false
+
+COPY source/frontend/ ./
+RUN npm run build
+
+# Stage 2: Install backend dependencies
+FROM python:{{RUNTIME_VERSION}}-slim AS backend-deps
+
+WORKDIR /app
+
+COPY source/backend/requirements.txt ./
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# Stage 3: Runtime — combined
+FROM python:{{RUNTIME_VERSION}}-slim
+
+WORKDIR /app
+
+COPY --from=backend-deps /install /usr/local
+COPY source/backend/ ./
+COPY --from=frontend-build /app/build ./static
+
+ENV PORT=8080
+EXPOSE 8080
+
+CMD ["python", "app.py"]

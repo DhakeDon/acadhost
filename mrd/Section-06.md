@@ -1355,6 +1355,7 @@ The `webhookSecret` and `webhookSecretBackend` fields are included so the studen
 | Project not found or not owned by student | `404` | `PROJECT_NOT_FOUND` | `Project not found` |
 | Project status is `deleted` | `400` | `PROJECT_DELETED` | `Cannot modify a deleted project` |
 | Database not found or not owned by student | `404` | `DATABASE_NOT_FOUND` | `Database not found` |
+| Docker container operation failed during recreation | `500` | `CONTAINER_ERROR` | `Failed to recreate container with new database` |
 
 ---
 
@@ -1410,6 +1411,7 @@ At least one field must be present.
 | No resource fields provided | `400` | `VALIDATION_ERROR` | `At least one resource field is required` |
 | CPU exceeds remaining quota | `400` | `CPU_QUOTA_EXCEEDED` | `CPU limit exceeds available quota ({available} cores remaining)` |
 | RAM exceeds remaining quota | `400` | `RAM_QUOTA_EXCEEDED` | `RAM limit exceeds available quota ({available} MB remaining)` |
+| Docker container operation failed during recreation | `500` | `CONTAINER_ERROR` | `Failed to recreate container with new resources` |
 
 ---
 

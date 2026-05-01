@@ -409,6 +409,7 @@ const webhookRoutes         = require('./routes/webhooks');
 // Express application
 // ============================================================
 const app = express();
+app.set('trust proxy', 1);
 
 // ---- Security headers ------------------------------------------------------
 // Disable contentSecurityPolicy — React SPAs manage their own CSP.
@@ -423,22 +424,27 @@ app.use(
 // ---- CORS ------------------------------------------------------------------
 // CORS_ORIGIN may be a comma-separated list of allowed origins.
 const allowedOrigins = process.env.CORS_ORIGIN
-  .split(',')
-  .map(o => o.trim())
-  .filter(Boolean);
+    .split(',')
+    .map(o => o.trim())
+    .filter(Boolean);
 
 app.use(
-  cors({
-    origin(origin, callback) {
-      // Allow requests with no origin (same-origin, curl, server-to-server).
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error(`CORS: origin "${origin}" is not allowed`));
-    },
-    credentials: true,  // Required for httpOnly SameSite=Strict refresh token cookie
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
+    cors({
+      origin(origin, callback) {
+        if (!origin) return callback(null, true);
+
+        const normalizedOrigin = origin.replace(/\/$/, '');
+
+        if (allowedOrigins.includes(normalizedOrigin)) {
+          return callback(null, true);
+        }
+
+        return callback(new Error(`CORS: origin "${origin}" is not allowed`));
+      },
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    })
 );
 
 // ---- Request logging -------------------------------------------------------
@@ -582,6 +588,13 @@ async function testDatabaseConnection() {
     process.exit(1);
   }
 }
+app.get('/', (req, res) => {
+  res.json({
+    status: 'OK',
+    message: 'AcadHost backend running 🚀',
+    time: new Date().toISOString()
+  });
+});
 
 // ============================================================
 // Nginx config sync on startup (Section 8.6.1)
