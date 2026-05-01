@@ -1,0 +1,75 @@
+# AcadHost — Development-only orchestration
+# NOT used in production.
+# Production: each service runs natively or as a managed Docker container directly.
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: acadhost-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+#  phpmyadmin:
+#    image: phpmyadmin/phpmyadmin:latest
+#    container_name: acadhost-phpmyadmin
+#    restart: unless-stopped
+#    environment:
+#      PMA_HOST: mysql
+#      PMA_PORT: 3306
+#      PHPMYADMIN_BASE_PATH: ${PHPMYADMIN_BASE_PATH:-/phpmyadmin}
+#    ports:
+#      - "${PHPMYADMIN_PORT:-8080}:80"
+#    depends_on:
+#      - mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: acadhost-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: host.docker.internal
+      PMA_PORT: 3306
+    ports:
+      - "${PHPMYADMIN_PORT:-8083}:80"
+    volumes:
+      - ./backend/phpmyadmin/signon.php:/var/www/html/signon.php
+      - ./backend/phpmyadmin/launch.php:/var/www/html/launch.php
+      - ./backend/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+
+  nginx:
+    image: nginx:latest
+    container_name: acadhost-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    volumes:
+      - ./nginx/conf.d/acadhost:/etc/nginx/conf.d/acadhost
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+
+  backend:
+    build:
+      context: ./backend
+    container_name: acadhost-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Override MYSQL_HOST to the Docker service name so the backend
+      # container reaches MySQL over the compose internal network.
+      MYSQL_HOST: mysql
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    depends_on:
+      - mysql
+    volumes:
+      - ./backend:/app
+      - ${PROJECTS_BASE_DIR:-C:/acadhost/projects}:/projects
+
+volumes:
+  mysql_data:

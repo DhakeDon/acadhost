@@ -1,0 +1,18 @@
+{
+  "name": "acadhost",
+  "version": "1.0.0",
+  "description": "AcadHost — self-hosted container-based web hosting platform for academic institutions",
+  "private": true,
+  "scripts": {
+    "dev": "cd backend && npm run dev",
+    "start": "cd backend && npm start",
+    "seed": "cd backend && npm run seed",
+    "build:student": "cd frontend/student-dashboard && npm run build",
+    "build:admin": "cd frontend/admin-dashboard && npm run build",
+    "build": "npm run build:student && npm run build:admin",
+    "install:backend": "cd backend && npm install",
+    "install:student": "cd frontend/student-dashboard && npm install",
+    "install:admin": "cd frontend/admin-dashboard && npm install",
+    "install:all": "npm run install:backend && npm run install:student && npm run install:admin"
+  }
+}
